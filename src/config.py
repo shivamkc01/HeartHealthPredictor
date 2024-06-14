@@ -1,0 +1,10 @@
+RAW_FILES = "../data/raw_data/clevelanda.csv"
+SEED = 42
+CLEANED_FILE = "../data/clean_data/first_cleaned.csv"
+FOLD_FILES = "../data/clean_data/train_fold.csv"
+LOGGING_FILS=  "../logs/"
+SMOTE_FILE = "../data/clean_data/df_smote.csv"
+SMOTE_FOLD_FILE = '../data/clean_data/train_smote_fold.csv'
+UNDERSAMPLE_FILE = "../data/clean_data/df_undersampling.csv"
+UNDERSAMPLE_FOLD_FILE = "../data/clean_data/train_fold_undersample.csv"
+SMOTE_10FOLD_FILE = "../data/clean_data/df_10fold_smote.csv"
