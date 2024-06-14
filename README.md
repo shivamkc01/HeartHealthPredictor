@@ -59,6 +59,82 @@ The primary motivation behind building this model is to predict the likelihood o
 4. **Maximum Heart Rate Achieved (thalach)**: The mean maximum heart rate is 149.61 bpm, ranging from 71 to 202 bpm, reflecting differences in cardiovascular fitness levels.
 5. **ST Depression Induced by Exercise (oldpeak)**: The average ST depression is 1.04, with values from 0 to 6.2, showing that while many individuals have no depression, a significant number have higher values indicating varying degrees of exercise-induced ischemia.
 
+## Our class distribution **Imbalance class**
+<div style="text-align:center;">
+    <img src="https://github.com/shivamkc01/HeartHealthPredictor/blob/main/plots/class_count.jpg" alt="target distribution" style="width:100%; max-width:800px;">
+</div>
+
+
+
+
+# <center>`Lets understand **Undersampling** and **Oversampling**`</center>
+
+**Oversampling:** In oversampling, you increase the number of instances of the minority class (in our case, "CHURN") to balance the class distribution. This can be done using techniques like `SMOTE (Synthetic Minority Over-sampling Technique)`, `ADASYN (Adaptive Synthetic Sampling)`, or simply by duplicating instances from the minority class.
+
+**Undersampling:** In undersampling, you decrease the number of instances of the majority class (in this case, "ACTIVE") to balance the class distribution. This can involve randomly removing instances from the majority class until a more balanced distribution is achieved.
+
+<div style="text-align:center;">
+    <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*7xf9e1EaoK5n05izIFBouA.png" alt="Image" />
+</div>
+
+<hr>
+
+### <b><u><span style="color:#ff6600">Each technique has its own set of advantages and disadvantages:</span></u></b></center></span></u></b>
+#### `Undersampling:`
+
+**Pros:**
+
+- **`Reduces Training Time`**: By reducing the number of instances in the majority class, undersampling can significantly decrease training time, especially for algorithms sensitive to large datasets.
+- **`Simplifies Model Interpretation`**: With a more balanced dataset, models may be simpler and easier to interpret, as they don't need to learn the nuances of the majority class as extensively.
+- **`May Improve Performance on the Minority Class`**: By focusing more on the minority class, models trained on undersampled data may achieve higher precision, recall, or other performance metrics for the minority class.
+
+**Cons:**
+
+- **`Information Loss`**: Removing instances from the majority class can lead to the loss of potentially valuable information, which may degrade the model's ability to generalize to unseen data.
+- **`Risk of Overfitting`**: Undersampling may increase the risk of overfitting, particularly if the dataset is already limited in size.
+- **`Biased Representation`**: The reduced representation of the majority class may not accurately reflect its true distribution, leading to biased model predictions.
+
+<hr>
+
+#### `Oversampling:`
+
+**Pros:**
+
+- **`Preserves Information`**: Oversampling techniques generate synthetic samples or replicate existing minority class instances, preserving information from the minority class and potentially improving model performance.
+- **`Balances Class Distribution`**: By increasing the representation of the minority class, oversampling can help balance the class distribution, reducing bias in model predictions.
+- **`Reduces Risk of Overfitting`**: Oversampling increases the amount of training data available to the model, which can reduce the risk of overfitting, especially in cases of severe class imbalance.
+
+**Cons:**
+
+- **`Potential Overfitting`**: Oversampling can introduce synthetic data points that may not accurately represent the true distribution of the minority class, leading to overfitting, especially if not carefully implemented.
+- **`Increased Computational Cost`**: Generating synthetic samples or replicating minority class instances can increase computational cost, especially for large datasets.
+- **`Model Sensitivity`**: Some oversampling techniques may introduce noise or patterns that are not representative of the underlying data distribution, potentially leading to decreased model performance.
+
+<hr>
+
+## Problem with default Cross Validation function when we have very high imbalance multiclasses the it distribute the class in each folds differently like below.
+<div style="text-align:center;">
+    <img src="https://github.com/shivamkc01/HeartHealthPredictor/blob/main/plots/folds_class.jpg" alt="Image" />
+</div>
+
+### <center><b><u><span style="color:#ff6600">OBSERVATIONS✍️</span></u></b></center>
+
+* In each `fold`, there is a noticeable class imbalance between all classes. The "0" class appears more frequently than the other class.
+
+* It seems like after using `StratifiedKFold` to create your folds, our target classes are distributed badly I would say. However, if the majority class (class 0) is significantly larger than the minority classes (classes 1,2,3 and 4.0), we still end up with `imbalanced folds`.
+
+**`we might want to consider techniques such as class weighting, `resampling method`s (e.g., `oversampling` the minority class), or using `evaluation metrics` that are sensitive to class imbalance to ensure that our model effectively learns from both classes and generalizes well`**
+
+## Now lets apply Oversampling (SMOTE) and see the distribution in our each folds.
+
+<div style="text-align:center;">
+    <img src="https://github.com/shivamkc01/HeartHealthPredictor/blob/main/plots/smote_folds_class.jpg" alt="Image" />
+</div>
+
+## <center><b><u><span style="color:#ff6600">OBSERVATIONS✍️</span></u></b></center>
+
+The class distribution after applying `SMOTE oversampling technique`. It seems that the class distribution is now balanced in each fold, with both classes (0 and 1) having approximately the same number of instances.
+
 ## Techniques and Models Used
 
 1. **Data Cleaning**: Removal of outliers, handling missing values, and ensuring data consistency.
