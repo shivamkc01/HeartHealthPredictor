@@ -1,5 +1,7 @@
 # Heart Disease Classification
-![](https://st1.thehealthsite.com/wp-content/uploads/2021/09/Heart.jpeg?impolicy=Medium_Widthonly&w=400)
+<div style="text-align:center;">
+    <img src="https://st1.thehealthsite.com/wp-content/uploads/2021/09/Heart.jpeg?impolicy=Medium_Widthonly&w=400" alt="Heart Disease Image" style="width:100%; max-width:800px;">
+</div>
 Welcome to the **Heart Disease Classification** project! This repository contains a data science project aimed at predicting the presence of heart disease based on various health-related features using machine learning techniques. We have followed rigorous data preprocessing, model training, and evaluation steps to develop accurate predictive models.
 
 ## Table of Contents
