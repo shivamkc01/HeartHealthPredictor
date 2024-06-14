@@ -8,3 +8,4 @@ SMOTE_FOLD_FILE = '../data/clean_data/train_smote_fold.csv'
 UNDERSAMPLE_FILE = "../data/clean_data/df_undersampling.csv"
 UNDERSAMPLE_FOLD_FILE = "../data/clean_data/train_fold_undersample.csv"
 SMOTE_10FOLD_FILE = "../data/clean_data/df_10fold_smote.csv"
+MODEL_OUTPUT = "../model/"

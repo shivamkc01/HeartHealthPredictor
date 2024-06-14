@@ -1,4 +1,4 @@
-
+import joblib  # Import joblib for model saving
 import argparse
 import logging
 import pandas as pd 
@@ -58,7 +58,6 @@ def baseline_training(fold, model, scale=False, metric='roc_auc', plot_roc=False
 
     model.fit(xtrain, ytrain)
 
-    # Check if model predicts probabilities or labels
     if hasattr(model, 'predict_proba'):
         train_preds_prob = model.predict_proba(xtrain)
         test_preds_prob = model.predict_proba(xvalid)
@@ -112,7 +111,6 @@ def baseline_training(fold, model, scale=False, metric='roc_auc', plot_roc=False
     return train_score, test_score
 
 if __name__ == "__main__":
-  # Lets define argparse
   parser = argparse.ArgumentParser()
   parser.add_argument("--fold", type=int, default=5)
   parser.add_argument("--model", type=str, default="lr", choices=["lr", "dt", "nb"])
@@ -125,13 +123,31 @@ if __name__ == "__main__":
   logging.basicConfig(filename=f"{config.LOGGING_FILS}/{args.logs}.log", level=logging.INFO)
   train_roc_auc_avg = []
   test_roc_auc_avg = []
-
+  xtrain_all = []
+  ytrain_all = []
 
   for fold in range(args.fold):
     train_roc_auc, test_roc_auc= baseline_training(fold, args.model, args.scale, args.metric, args.plot_roc)
     train_roc_auc_avg.append(train_roc_auc)
     test_roc_auc_avg.append(test_roc_auc)
 
+    df = pd.read_csv(config.SMOTE_10FOLD_FILE, na_values="?")
+    df.dropna(axis=0, inplace=True)
+    df_train = df[df.skfold != fold].reset_index(drop=True)
+    xtrain_all.append(df_train.drop('class', axis=1).values)
+    ytrain_all.append(df_train['class'].values)
+
   logging.info(f"Overall {args.metric} on all 10 FOLDs in TRAINING SET={np.mean(train_roc_auc_avg)}, TESTING SET={np.mean(test_roc_auc_avg)}") 
   print(f"Overall Training {args.metric}: {np.mean(train_roc_auc_avg)}, Testing {args.metric} : {np.mean(test_roc_auc_avg)}")
-  
+
+  xtrain_final = np.concatenate(xtrain_all, axis=0)
+  ytrain_final = np.concatenate(ytrain_all, axis=0)
+
+
+  final_model = model_dispatcher.models[args.model]
+  final_model.fit(xtrain_final, ytrain_final)
+
+  overall_model_filename = f"{config.MODEL_OUTPUT}/overall_{args.model}_model.joblib"
+  joblib.dump(final_model, overall_model_filename)
+  print(f"Saved overall model to: {overall_model_filename}")
+  logging.info(f"Saved overall model to: {overall_model_filename}")
