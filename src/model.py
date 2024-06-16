@@ -113,7 +113,7 @@ def baseline_training(fold, model, scale=False, metric='roc_auc', plot_roc=False
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--fold", type=int, default=5)
-  parser.add_argument("--model", type=str, default="lr", choices=["lr", "dt", "nb"])
+  parser.add_argument("--model", type=str, default="lr", choices=["lr", "dt", "nb", "rf", "svm"])
   parser.add_argument("--logs", type=str, default=None)
   parser.add_argument("--scale", type=bool, default=False)
   parser.add_argument("--metric", type=str, default='roc_auc', choices=['f1_score', 'roc_auc', 'precision', 'recall', 'accuracy', 'f1_weighted'])
