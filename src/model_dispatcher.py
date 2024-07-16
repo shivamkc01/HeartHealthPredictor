@@ -4,6 +4,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
+from sklearn.cluster import KMeans
 import config 
 
 
@@ -17,5 +18,7 @@ models = {
   'dt' : DecisionTreeClassifier(max_depth=5, min_samples_split=7,min_samples_leaf=4),
   'nb': GaussianNB(priors=class_priors.values),
   'rf': RandomForestClassifier(),
-  'svm' : SVC(probability=True)
+  'svm' : SVC(probability=True),
+  'kmc' : KMeans(n_clusters=5)
+  
 }

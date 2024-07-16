@@ -31,7 +31,14 @@ log "Author: Shivam Chhetry"
 # echo "================================================================================================================"
 
 
-echo "SVM TRAINING STARTED!"
-python model.py --fold 10 --model svm --logs naiveBayes_model --scale True --metric roc_auc --plot_roc True
+# echo "SVM TRAINING STARTED!"
+# python model.py --fold 10 --model svm --logs svm_model --scale True --metric roc_auc --plot_roc True
+
+# echo "SUCCESSFUL DONE!"s
+
+
+
+echo "KMeans Cluster TRAINING STARTED!"
+python model.py --fold 10 --model kmc --logs kmc_model --scale True --metric roc_auc --plot_roc True
 
 echo "SUCCESSFUL DONE!"s

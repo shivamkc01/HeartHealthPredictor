@@ -56,64 +56,80 @@ def baseline_training(fold, model, scale=False, metric='roc_auc', plot_roc=False
     logging.info(f"Model Name: {model}")
     logging.info(f"Hyperparameters: {model.get_params()}")
 
-    model.fit(xtrain, ytrain)
+    if model == model_dispatcher.models['kmc']:
+        # Training KMeans
+        model.fit(xtrain)
+        
+        # Evaluating KMeans
+        train_score = model.inertia_  # You can also use silhouette_score if you have labels
+        test_score = model.inertia_
+        
+        print(f"Training inertia: {train_score}")
+        print(f"Testing inertia: {test_score}")
 
-    if hasattr(model, 'predict_proba'):
-        train_preds_prob = model.predict_proba(xtrain)
-        test_preds_prob = model.predict_proba(xvalid)
+        logging.info(f"Training inertia: {train_score}")
+        logging.info(f"Testing inertia: {test_score}")
     else:
-        train_preds_prob = model.predict(xtrain)
-        test_preds_prob = model.predict(xvalid)
+        # Training supervised models
+        model.fit(xtrain, ytrain)
 
-    if metric == 'f1_score':
-        train_score = metrics.f1_score(ytrain, model.predict(xtrain), average='weighted')
-        test_score = metrics.f1_score(yvalid, model.predict(xvalid),average='weighted')
-    elif metric == 'roc_auc':
-        train_score = metrics.roc_auc_score(ytrain, train_preds_prob, multi_class='ovr')
-        test_score = metrics.roc_auc_score(yvalid, test_preds_prob, multi_class='ovr')
-    elif metric == 'precision':
-        train_score = metrics.precision_score(ytrain, model.predict(xtrain),average='weighted')
-        test_score = metrics.precision_score(yvalid, model.predict(xvalid),average='weighted')
-    elif metric == 'recall':
-        train_score = metrics.recall_score(ytrain, model.predict(xtrain),average='weighted')
-        test_score = metrics.recall_score(yvalid, model.predict(xvalid),average='weighted')
-    elif metric == 'accuracy':
-        train_score = metrics.accuracy_score(ytrain, model.predict(xtrain))
-        test_score = metrics.accuracy_score(yvalid, model.predict(xvalid))
-    else:
-        raise ValueError(f"Unsupported metric: {metric}")
+        if hasattr(model, 'predict_proba'):
+            train_preds_prob = model.predict_proba(xtrain)
+            test_preds_prob = model.predict_proba(xvalid)
+        else:
+            train_preds_prob = model.predict(xtrain)
+            test_preds_prob = model.predict(xvalid)
 
-    print(f"Training {metric}: {train_score}")
-    print(f"Testing {metric}: {test_score}")
+        if metric == 'f1_score':
+            train_score = metrics.f1_score(ytrain, model.predict(xtrain), average='weighted')
+            test_score = metrics.f1_score(yvalid, model.predict(xvalid), average='weighted')
+        elif metric == 'roc_auc':
+            train_score = metrics.roc_auc_score(ytrain, train_preds_prob, multi_class='ovr')
+            test_score = metrics.roc_auc_score(yvalid, test_preds_prob, multi_class='ovr')
+        elif metric == 'precision':
+            train_score = metrics.precision_score(ytrain, model.predict(xtrain), average='weighted')
+            test_score = metrics.precision_score(yvalid, model.predict(xvalid), average='weighted')
+        elif metric == 'recall':
+            train_score = metrics.recall_score(ytrain, model.predict(xtrain), average='weighted')
+            test_score = metrics.recall_score(yvalid, model.predict(xvalid), average='weighted')
+        elif metric == 'accuracy':
+            train_score = metrics.accuracy_score(ytrain, model.predict(xtrain))
+            test_score = metrics.accuracy_score(yvalid, model.predict(xvalid))
+        else:
+            raise ValueError(f"Unsupported metric: {metric}")
 
-    logging.info(f"Training {metric}: {train_score}")
-    logging.info(f"Testing {metric}: {test_score}")
+        print(f"Training {metric}: {train_score}")
+        print(f"Testing {metric}: {test_score}")
 
-    train_classification_report = metrics.classification_report(
-        ytrain,
-        model.predict(xtrain),
-    )
-    logging.info(f"Classification Report - Traning (Fold {fold}):\n{train_classification_report}")
+        logging.info(f"Training {metric}: {train_score}")
+        logging.info(f"Testing {metric}: {test_score}")
 
-    test_classification_report = metrics.classification_report(
-        yvalid,
-        model.predict(xvalid),
-    )
-    logging.info(f"Classification Report - Testing (Fold {fold}):\n{test_classification_report}")
-    logging.info("#"*20)
+        train_classification_report = metrics.classification_report(
+            ytrain,
+            model.predict(xtrain),
+        )
+        logging.info(f"Classification Report - Traning (Fold {fold}):\n{train_classification_report}")
+
+        test_classification_report = metrics.classification_report(
+            yvalid,
+            model.predict(xvalid),
+        )
+        logging.info(f"Classification Report - Testing (Fold {fold}):\n{test_classification_report}")
+    
+    logging.info("#" * 20)
     train_scores.append(train_score)
     test_scores.append(test_score)
 
-    if plot_roc:
-        plot_roc_curve_for_classes(model, xtrain, ytrain, [0, 1, 2, 3, 4], f' Training ROC Curve for Fold {fold+1} using {args.model} ')
-        plot_roc_curve_for_classes(model, xvalid, yvalid, [0, 1, 2, 3, 4], f'Testing ROC Curve for Fold {fold+1} using {args.model} ')
+    if plot_roc and model != model_dispatcher.models['kmc']:
+        plot_roc_curve_for_classes(model, xtrain, ytrain, [0, 1, 2, 3, 4], f' Training ROC Curve for Fold {fold + 1} using {args.model} ')
+        plot_roc_curve_for_classes(model, xvalid, yvalid, [0, 1, 2, 3, 4], f'Testing ROC Curve for Fold {fold + 1} using {args.model} ')
 
     return train_score, test_score
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--fold", type=int, default=5)
-  parser.add_argument("--model", type=str, default="lr", choices=["lr", "dt", "nb", "rf", "svm"])
+  parser.add_argument("--model", type=str, default="lr", choices=["lr", "dt", "nb", "rf", "svm", "kmc"])
   parser.add_argument("--logs", type=str, default=None)
   parser.add_argument("--scale", type=bool, default=False)
   parser.add_argument("--metric", type=str, default='roc_auc', choices=['f1_score', 'roc_auc', 'precision', 'recall', 'accuracy', 'f1_weighted'])
